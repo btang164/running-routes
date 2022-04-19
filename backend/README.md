@@ -27,7 +27,7 @@ poetry run running_routes \
 |---|---|---|
 | `distance` | Maximum distance covered in a route|3000|
 | `n`| The number of running routes| 5|
-| `start_coordinate` | Coordinate where all routes start and stop | `{"lat": -37.80960885346664, "long": 144.96323726880522}`|
+| `start_coordinate` | Coordinate where all routes start and stop | `{"lat": -37.80960885346664, "lng": 144.96323726880522}`|
 |`node`| Network analogue to a lat-long coordinate | 0
 |`start_node`| Network analogue of `start_coordinate`| 0
 |`tour`| A list of nodes that start and end at `start_coordinate` where each consecutive node is adjacent in the network|`[0, 1, 0]`
