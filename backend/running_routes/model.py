@@ -20,11 +20,11 @@ VRP_DEFAULT_PARAMETERS = {
 class ModelFactory(ABC):
     """Factory that represents different model implementations"""
     @abstractmethod
-    def __init__(self, n, distance, **kwargs):
+    def __init__(self, **kwargs):
         """Load parameters"""
 
     @abstractmethod
-    def solve(self, location: Dict, network: NetworkFactory) -> List[List]:
+    def solve(self, n: int, distance: int, start_coordinate: Dict, network: NetworkFactory) -> List[List]:
         """Creates and solves the model"""
 
 
