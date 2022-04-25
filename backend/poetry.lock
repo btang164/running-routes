@@ -578,7 +578,7 @@ socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "5da8116a47c0bef1f6419c90445cd8fc8c4a38d8e1559711bc7b1f236e3d877e"
+content-hash = "347625ff20889932d4a273c6e5936aab8f288423bcb7e893ebeda6ce2b9795ed"
 
 [metadata.files]
 absl-py = [
