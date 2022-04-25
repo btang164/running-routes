@@ -27,12 +27,12 @@ poetry run running_routes \
 |---|---|---|
 | `distance` | Maximum distance covered in a route|3000|
 | `n`| The number of running routes| 5|
-| `start_coordinate` | Coordinate where all routes start and stop | `{"lat": -37.80960885346664, "lng": 144.96323726880522}`|
+| `start_coordinate` | Coordinate (lat, lng) where all routes start and stop | `[-37.80960885346664, 144.96323726880522]`|
 |`node`| Network analogue to a lat-long coordinate | 0
 |`start_node`| Network analogue of `start_coordinate`| 0
 |`tour`| A list of nodes that start and end at `start_coordinate` where each consecutive node is adjacent in the network|`[0, 1, 0]`
 |`tours`| Array of length `n` where each element is a `tour`|`[[0, 1, 0], [0, 2, 0]]`
-|`routes`| Lat-long representation of `tours`| `[[{"lat"...}, ...}], [{"lat"...}, ...]]`
+|`routes`| Lat-long representation of `tours` - May contain route metadata| `[[[1, 1], ..., [1, 1]]]`
 |`length`| The distance, in meters, between two adjacent nodes| 5 |
 
 
@@ -53,11 +53,11 @@ graph LR;
         direction TB
         search1--tour-->searchN
         end
-    post_processing
+    assembler
     end
 
     subgraph output
-    ROUTES(routes)
+    ???
     end
 
     N --> network;
@@ -65,6 +65,6 @@ graph LR;
     START_COORDINATE --> network;
     network --> model;
     model --tour--> search1
-    searchN --tour-->post_processing
-    post_processing --> ROUTES
+    searchN --tour-->assembler
+    assembler--route--> ???
 ```
