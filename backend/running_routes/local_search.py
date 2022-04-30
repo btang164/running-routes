@@ -32,8 +32,7 @@ class BacktrackEliminationLocalSearch(LocalSearchFactory):
         self.parameters = parameters
 
     def iterate(
-            self, tours: List[List], distance: Optional[int] = None, 
-            network: Optional[NetworkFactory] = None) -> List[List]:
+            self, tours: List[List], distance: int, network: NetworkFactory) -> List[List]:
         output_tours = []
         for tour in tours:
             G = nx.Graph()

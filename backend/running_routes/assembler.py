@@ -38,10 +38,10 @@ class RestAPIAssembler(AssemblerFactory):
 
     def generate_output(self, tours: List[List], distance: int, network: NetworkFactory) -> List:
         network_nodes = network.nodes
-        routes = []
+        routes = {"routes": []}
         for tour in tours:
             coordinates = [[network_nodes[node]["y"], network_nodes[node]["x"]]for node in tour]
             route_distance = sum(network.length(x, y) for x, y in zip(tour, tour[1:]))
             route = {"coordinates": coordinates, "distance": route_distance}
-            routes.append(route)
+            routes["routes"].append(route)
         return routes

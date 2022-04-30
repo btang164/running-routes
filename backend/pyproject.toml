@@ -11,6 +11,7 @@ osmnx = "^1.1.2"
 ortools = "^9.3.10497"
 scikit-learn = "^1.0.2"
 click = "^8.1.2"
+Flask = "^2.1.2"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.6.0"
