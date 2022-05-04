@@ -1,0 +1,32 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - build
+  
+jobs:
+  build:
+
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Generate requirements.txt
+      run: |
+        cd backend
+        curl -sSL https://install.python-poetry.org | python3 -
+        poetry --version
+        poetry export -f requirements.txt -E docker --output requirements.txt
+        
+    - name: Build Docker image
+      run: |
+        cd backend
+        docker build -t btang164/running-routes:latest Dockerfile
+        docker tag btang164/running-routes:latest btang164/running-routes:${{ github.sha }}
+
+    - name: Push image to DockerHub
+      run: |
+        docker login -u btang164 -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
+        docker push btang/running-routes:latest
+        docker push btang/running-routes:${{ github.sha }}
