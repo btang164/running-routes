@@ -29,5 +29,5 @@ jobs:
     - name: Push image to DockerHub
       run: |
         docker login -u btang164 -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
-        docker push btang/running-routes:latest
-        docker push btang/running-routes:${{ github.sha }}
+        docker push btang164/running-routes:latest
+        docker push btang164/running-routes:${{ github.sha }}
