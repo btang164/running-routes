@@ -31,10 +31,10 @@ jobs:
 
     - name: Push image to DockerHub
       env: 
-        SHORT_SHA: git rev-parse --short HEAD
       run: |
+        SHORT_SHA=$(git rev-parse --short HEAD)
         cat ${{ secrets.DOCKER_ACCESS_TOKEN }} | docker login -u btang164 --password-stdin
-        docker tag running-routes:latest running-routes:${{ SHORT_SHA }}
+        docker tag running-routes:latest "running-routes:${{ SHORT_SHA }}
         docker push btang164/running-routes:latest
         docker push btang164/running-routes:${{ SHORT_SHA }}
       
@@ -43,7 +43,7 @@ jobs:
         GOOGLE_CLOUD_REGION: australia-souteast2
         KEY_TYPE: "_json_key"
       run: |
-        PROJECT_ID=cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | jq '.project_id'
+        PROJECT_ID=$(cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | jq '.project_id')
         cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | docker login -u ${{ KEY_TYPE }} --password-stdin \
         "https://${{ GOOGLE_CLOUD_REGION }}-docker.pkg.dev"
         docker tag running-routes:latest "${{ GOOGLE_CLOUD_REGION }}-docker.pkg.dev/${{ PROJECT_ID }}/running-routes/running-routes:latest"
