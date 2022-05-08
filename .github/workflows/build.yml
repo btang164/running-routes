@@ -4,13 +4,17 @@ on:
   push:
     branches:
       - build
-  
+
 jobs:
   build:
 
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt install jq
     
     - name: Generate python wheel and dependencies
       run: |
@@ -23,11 +27,24 @@ jobs:
     - name: Build Docker image
       run: |
         cd backend
-        docker build -t btang164/running-routes:latest .
-        docker tag btang164/running-routes:latest btang164/running-routes:${{ github.sha }}
+        docker build -t running-routes:latest .
 
     - name: Push image to DockerHub
+      env: 
+        SHORT_SHA: git rev-parse --short HEAD
       run: |
-        docker login -u btang164 -p ${{ secrets.DOCKER_ACCESS_TOKEN }}
+        cat ${{ secrets.DOCKER_ACCESS_TOKEN }} | docker login -u btang164 --password-stdin
+        docker tag running-routes:latest running-routes:${{ SHORT_SHA }}
         docker push btang164/running-routes:latest
-        docker push btang164/running-routes:${{ github.sha }}
+        docker push btang164/running-routes:${{ SHORT_SHA }}
+      
+    - name: Push image to Google Artifact Registry
+      env:
+        GOOGLE_CLOUD_REGION: australia-souteast2
+        KEY_TYPE: "_json_key"
+      run: |
+        PROJECT_ID=cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | jq '.project_id'
+        cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | docker login -u ${{ KEY_TYPE }} --password-stdin \
+        "https://${{ GOOGLE_CLOUD_REGION }}-docker.pkg.dev"
+        docker tag running-routes:latest "${{ GOOGLE_CLOUD_REGION }}-docker.pkg.dev/${{ PROJECT_ID }}/running-routes/running-routes:latest"
+        docker push "${{ GOOGLE_CLOUD_REGION }}-docker.pkg.dev/${{ PROJECT_ID }}/running-routes/running-routes:latest"
