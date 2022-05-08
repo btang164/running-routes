@@ -30,7 +30,6 @@ jobs:
         docker build -t running-routes:latest .
 
     - name: Push image to DockerHub
-      env: 
       run: |
         SHORT_SHA=$(git rev-parse --short HEAD)
         cat ${{ secrets.DOCKER_ACCESS_TOKEN }} | docker login -u btang164 --password-stdin
