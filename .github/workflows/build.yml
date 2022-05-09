@@ -30,20 +30,22 @@ jobs:
         docker build -t running-routes:latest .
 
     - name: Push image to DockerHub
-      run: |
+      env: |
         SHORT_SHA=$(git rev-parse --short HEAD)
+      run: |
         cat ${{ secrets.DOCKER_ACCESS_TOKEN }} | docker login -u btang164 --password-stdin
-        docker tag running-routes:latest "running-routes:${{ SHORT_SHA }}
+        docker tag running-routes:latest "running-routes:${{ env.SHORT_SHA }}
         docker push btang164/running-routes:latest
-        docker push btang164/running-routes:${{ SHORT_SHA }}
+        docker push btang164/running-routes:${{ env.SHORT_SHA }}
       
     - name: Push image to Google Artifact Registry
       env:
         GOOGLE_CLOUD_REGION: australia-souteast2
         KEY_TYPE: "_json_key"
+        PROJECT_ID: $(cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | jq '.project_id')
+        IMAGE_URL: "${{ GOOGLE_CLOUD_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/btang164/running-routes:latest"
       run: |
-        PROJECT_ID=$(cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | jq '.project_id')
         cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | docker login -u ${{ KEY_TYPE }} --password-stdin \
         "https://${{ GOOGLE_CLOUD_REGION }}-docker.pkg.dev"
-        docker tag running-routes:latest "${{ GOOGLE_CLOUD_REGION }}-docker.pkg.dev/${{ PROJECT_ID }}/running-routes/running-routes:latest"
-        docker push "${{ GOOGLE_CLOUD_REGION }}-docker.pkg.dev/${{ PROJECT_ID }}/running-routes/running-routes:latest"
+        docker tag running-routes:latest ${{ env.IMAGE_URL }}
+        docker push ${{ env.IMAGE_URL }}
