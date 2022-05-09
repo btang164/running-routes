@@ -5,9 +5,6 @@ on:
     branches:
       - build
 
-env:
-  GOOGLE_CLOUD_REGION: "australia-southeast2"
-
 jobs:
   build:
     runs-on: ubuntu-20.04
@@ -32,11 +29,11 @@ jobs:
         echo "Starting to tag images"
         PROJECT_ID=${{ secrets.GOOGLE_PROJECT_ID }}
         echo $PROJECT_ID
-        SHORT_SHA=$(github.sha::7)
+        SHORT_SHA=$(git rev-parse --short HEAD)
         echo $SHORT_SHA
         echo "::set-output name=DOCKERHUB_LATEST::btang164/running-routes:latest"
         echo "::set-output name=DOCKERHUB_SHA::btang164/running-routes:"$SHORT_SHA
-        echo "::set-output name=GOOGLE_LATEST::https://"${env.GOOGLE_CLOUD_REGION}"-docker.pkg.dev"${PROJECT_ID}"/btang164/running-routes:latest"
+        echo "::set-output name=GOOGLE_LATEST::https://australia-southeast2-docker.pkg.dev/running-routes-345611/btang164/running-routes:latest"
 
     - name: Build Docker image
       run: |
@@ -52,6 +49,6 @@ jobs:
       
     - name: Push image to Google Artifact Registry
       run: |
-        cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | docker login -u _json_key --password-stdin "https://${{ env.GOOGLE_CLOUD_REGION }}-docker.pkg.dev"
+        cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | docker login -u _json_key --password-stdin "https://australia-southeast2-docker.pkg.dev"
         docker tag ${{ steps.images.outputs.DOCKERHUB_LATEST }} ${{ steps.images.outputs.GOOGLE_LATEST }}
         docker push ${{ steps.images.outputs.GOOGLE_LATEST }}
