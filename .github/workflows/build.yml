@@ -10,6 +10,8 @@ jobs:
 
     runs-on: ubuntu-20.04
     steps:
+    env:
+      GOOGLE_CLOUD_REGION: "australia-southeast2"
     - uses: actions/checkout@v2
     
     - name: Install system dependencies
@@ -31,8 +33,6 @@ jobs:
     
     - name: Set image names
       id: images
-      env:
-        GOOGLE_CLOUD_REGION: "australia-southeast2"
       run: |
         PROJECT_ID=$(cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | jq '.project_id')
         echo "::set-output name=DOCKERHUB_LATEST::'btang164/running-routes:latest'
@@ -47,9 +47,7 @@ jobs:
         docker push ${{ steps.images.output.DOCKERHUB_SHA }} 
       
     - name: Push image to Google Artifact Registry
-      env:
-        KEY_TYPE: "_json_key"
       run: |
-        cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | docker login -u ${{ KEY_TYPE }} --password-stdin "https://${{ GOOGLE_CLOUD_REGION }}-docker.pkg.dev"
+        cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | docker login -u _json_key --password-stdin "https://${{ env.GOOGLE_CLOUD_REGION }}-docker.pkg.dev"
         docker tag ${{ steps.images.outputs.DOCKERHUB_LATEST }} ${{ steps.images.outputs.GOOGLE_LATEST }}
         docker push ${{ steps.images.outputs.GOOGLE_LATEST }}
