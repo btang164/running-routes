@@ -27,25 +27,29 @@ jobs:
     - name: Build Docker image
       run: |
         cd backend
-        docker build -t running-routes:latest .
+        docker build -t ${{ steps.images.outputs.DOCKERHUB_LATEST }}
+    
+    - name: Set image names
+      id: images
+      env:
+        GOOGLE_CLOUD_REGION: "australia-southeast2"
+      run: |
+        PROJECT_ID=$(cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | jq '.project_id')
+        echo "::set-output name=DOCKERHUB_LATEST::'btang164/running-routes:latest'
+        echo "::set-output name=DOCKERHUB_SHA::'btang164/running-routes:${github.sha::7}'"
+        echo "::set-output name=GOOGLE_LATEST::'https://${env.GOOGLE_CLOUD_REGION}-docker.pkg.dev${PROJECT_ID}/btang164/running-routes:latest'"
 
     - name: Push image to DockerHub
-      env: |
-        SHORT_SHA=$(git rev-parse --short HEAD)
       run: |
         cat ${{ secrets.DOCKER_ACCESS_TOKEN }} | docker login -u btang164 --password-stdin
-        docker tag running-routes:latest "running-routes:${{ env.SHORT_SHA }}
-        docker push btang164/running-routes:latest
-        docker push btang164/running-routes:${{ env.SHORT_SHA }}
+        docker tag ${{ steps.images.outputs.DOCKERHUB_LATEST }} ${{ steps.images.outputs.DOKERHUB_SHA }}
+        docker push ${{ steps.images.output.DOCKERHUB_LATEST }} 
+        docker push ${{ steps.images.output.DOCKERHUB_SHA }} 
       
     - name: Push image to Google Artifact Registry
       env:
-        GOOGLE_CLOUD_REGION: australia-souteast2
         KEY_TYPE: "_json_key"
-        PROJECT_ID: $(cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | jq '.project_id')
-        IMAGE_URL: "${{ GOOGLE_CLOUD_REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/btang164/running-routes:latest"
       run: |
-        cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | docker login -u ${{ KEY_TYPE }} --password-stdin \
-        "https://${{ GOOGLE_CLOUD_REGION }}-docker.pkg.dev"
-        docker tag running-routes:latest ${{ env.IMAGE_URL }}
-        docker push ${{ env.IMAGE_URL }}
+        cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | docker login -u ${{ KEY_TYPE }} --password-stdin "https://${{ GOOGLE_CLOUD_REGION }}-docker.pkg.dev"
+        docker tag ${{ steps.images.outputs.DOCKERHUB_LATEST }} ${{ steps.images.outputs.GOOGLE_LATEST }}
+        docker push ${{ steps.images.outputs.GOOGLE_LATEST }}
