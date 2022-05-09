@@ -30,7 +30,7 @@ jobs:
       id: images
       run: |
         echo "Starting to tag images"
-        PROJECT_ID=$(jq '.project_id' ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }})
+        PROJECT_ID=$(echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}" | jq --raw-output '.project_id')
         echo $PROJECT_ID
         SHORT_SHA=$(github.sha::7)
         echo $SHORT_SHA
