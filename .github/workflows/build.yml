@@ -1,0 +1,59 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - build
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Install system dependencies
+      run: |
+        sudo apt install jq
+    
+    - name: Generate python wheel and dependencies
+      run: |
+        cd backend
+        curl -sSL https://install.python-poetry.org | python3 -
+        poetry --version
+        poetry build -f wheel
+        poetry export -f requirements.txt -E docker --output requirements.txt
+    
+    - name: Set image names
+      id: images
+      run: |
+        echo "Starting to tag images"
+        PROJECT_ID=${{ secrets.GOOGLE_PROJECT_ID }}
+        echo $PROJECT_ID
+        SHORT_SHA=$(git rev-parse --short HEAD)
+        echo $SHORT_SHA
+        echo "::set-output name=DOCKERHUB_LATEST::btang164/running-routes:latest"
+        echo "::set-output name=DOCKERHUB_SHA::btang164/running-routes:"$SHORT_SHA
+        echo "::set-output name=GOOGLE_LATEST::australia-southeast2-docker.pkg.dev/running-routes-345611/btang164/running-routes:latest"
+
+    - name: Build Docker image
+      run: |
+        cd backend
+        docker build -t ${{ steps.images.outputs.DOCKERHUB_LATEST }} .
+
+    - name: Push image to DockerHub
+      run: |
+        docker login -u btang164 -p ${{ secrets.DOCKER_ACCESS_TOKEN }} 
+        docker tag ${{ steps.images.outputs.DOCKERHUB_LATEST }} ${{ steps.images.outputs.DOCKERHUB_SHA }}
+        docker push ${{ steps.images.outputs.DOCKERHUB_SHA }} 
+        docker push ${{ steps.images.outputs.DOCKERHUB_LATEST }} 
+      
+    - name: Sign into Google Cloud
+      uses: 'google-github-actions/auth@v0'
+      with:
+        credentials_json: '${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}'
+
+    - name: Push image to Google Artifact Registry
+      run: |
+        gcloud auth configure-docker australia-southeast2-docker.pkg.dev
+        docker tag ${{ steps.images.outputs.DOCKERHUB_LATEST }} ${{ steps.images.outputs.GOOGLE_LATEST }}
+        docker push ${{ steps.images.outputs.GOOGLE_LATEST }}

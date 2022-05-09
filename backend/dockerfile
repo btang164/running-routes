@@ -8,4 +8,7 @@ COPY ./dist/*.whl .
 RUN pip3 install *.whl
 
 FROM osgeo/gdal:ubuntu-small-latest
+WORKDIR /app
+COPY ./app.py ./app.py
 COPY --from=build /usr/local/lib/python3.8/dist-packages/ /usr/local/lib/python3.8/dist-packages/
+CMD exec gunicorn --bind :$PORT --workers 1 --threads --timeout 0 app:app
