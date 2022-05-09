@@ -44,8 +44,8 @@ jobs:
       run: |
         docker login -u btang164 -p ${{ secrets.DOCKER_ACCESS_TOKEN }} 
         docker tag ${{ steps.images.outputs.DOCKERHUB_LATEST }} ${{ steps.images.outputs.DOCKERHUB_SHA }}
-        docker push ${{ steps.images.outputs.DOCKERHUB_LATEST }} 
         docker push ${{ steps.images.outputs.DOCKERHUB_SHA }} 
+        docker push ${{ steps.images.outputs.DOCKERHUB_LATEST }} 
       
     - name: Sign into Google Cloud
       uses: 'google-github-actions/auth@v0'
