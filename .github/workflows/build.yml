@@ -43,7 +43,7 @@ jobs:
     - name: Push image to DockerHub
       run: |
         docker login -u btang164 -p ${{ secrets.DOCKER_ACCESS_TOKEN }} 
-        docker tag ${{ steps.images.outputs.DOCKERHUB_LATEST }} ${{ steps.images.outputs.DOKERHUB_SHA }}
+        docker tag ${{ steps.images.outputs.DOCKERHUB_LATEST }} ${{ steps.images.outputs.DOCKERHUB_SHA }}
         docker push ${{ steps.images.output.DOCKERHUB_LATEST }} 
         docker push ${{ steps.images.output.DOCKERHUB_SHA }} 
       
