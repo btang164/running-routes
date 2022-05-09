@@ -29,7 +29,7 @@ jobs:
     - name: Set image names
       id: images
       run: |
-        PROJECT_ID=$(cat ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }} | jq '.project_id')
+        PROJECT_ID=$(jq '.project_id' ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }})
         echo "::set-output name=DOCKERHUB_LATEST::'btang164/running-routes:latest'
         echo "::set-output name=DOCKERHUB_SHA::'btang164/running-routes:${github.sha::7}'"
         echo "::set-output name=GOOGLE_LATEST::'https://${env.GOOGLE_CLOUD_REGION}-docker.pkg.dev${PROJECT_ID}/btang164/running-routes:latest'"
