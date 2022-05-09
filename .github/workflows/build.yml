@@ -5,12 +5,13 @@ on:
     branches:
       - build
 
+env:
+  GOOGLE_CLOUD_REGION: "australia-southeast2"
+
 jobs:
   build:
     runs-on: ubuntu-20.04
     steps:
-    env:
-      GOOGLE_CLOUD_REGION: "australia-southeast2"
     - uses: actions/checkout@v2
     
     - name: Install system dependencies
