@@ -25,11 +25,6 @@ jobs:
         poetry --version
         poetry build -f wheel
         poetry export -f requirements.txt -E docker --output requirements.txt
-        
-    - name: Build Docker image
-      run: |
-        cd backend
-        docker build -t ${{ steps.images.outputs.DOCKERHUB_LATEST }}
     
     - name: Set image names
       id: images
@@ -38,6 +33,11 @@ jobs:
         echo "::set-output name=DOCKERHUB_LATEST::'btang164/running-routes:latest'
         echo "::set-output name=DOCKERHUB_SHA::'btang164/running-routes:${github.sha::7}'"
         echo "::set-output name=GOOGLE_LATEST::'https://${env.GOOGLE_CLOUD_REGION}-docker.pkg.dev${PROJECT_ID}/btang164/running-routes:latest'"
+
+    - name: Build Docker image
+      run: |
+        cd backend
+        docker build -t ${{ steps.images.outputs.DOCKERHUB_LATEST }} .
 
     - name: Push image to DockerHub
       run: |
