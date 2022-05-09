@@ -30,12 +30,12 @@ jobs:
       id: images
       run: |
         echo "Starting to tag images"
-        PROJECT_ID=$(echo "${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}" | jq --raw-output '.project_id')
+        PROJECT_ID=${{ secrets.GOOGLE_PROJECT_ID }}
         echo $PROJECT_ID
         SHORT_SHA=$(github.sha::7)
         echo $SHORT_SHA
         echo "::set-output name=DOCKERHUB_LATEST::btang164/running-routes:latest"
-        echo "::set-output name=DOCKERHUB_SHA::btang164/running-routes:"${github.sha::7}
+        echo "::set-output name=DOCKERHUB_SHA::btang164/running-routes:"$SHORT_SHA
         echo "::set-output name=GOOGLE_LATEST::https://"${env.GOOGLE_CLOUD_REGION}"-docker.pkg.dev"${PROJECT_ID}"/btang164/running-routes:latest"
 
     - name: Build Docker image
