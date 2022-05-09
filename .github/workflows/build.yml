@@ -33,7 +33,7 @@ jobs:
         echo $SHORT_SHA
         echo "::set-output name=DOCKERHUB_LATEST::btang164/running-routes:latest"
         echo "::set-output name=DOCKERHUB_SHA::btang164/running-routes:"$SHORT_SHA
-        echo "::set-output name=GOOGLE_LATEST::https://australia-southeast2-docker.pkg.dev/running-routes-345611/btang164/running-routes:latest"
+        echo "::set-output name=GOOGLE_LATEST::australia-southeast2-docker.pkg.dev/running-routes-345611/btang164/running-routes:latest"
 
     - name: Build Docker image
       run: |
@@ -54,5 +54,6 @@ jobs:
 
     - name: Push image to Google Artifact Registry
       run: |
+        gcloud auth configure-docker australia-southeast2-docker.pkg.dev
         docker tag ${{ steps.images.outputs.DOCKERHUB_LATEST }} ${{ steps.images.outputs.GOOGLE_LATEST }}
         docker push ${{ steps.images.outputs.GOOGLE_LATEST }}
