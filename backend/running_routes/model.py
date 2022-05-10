@@ -12,6 +12,7 @@ from typing import Dict, List, Tuple
 
 VRP_DEFAULT_PARAMETERS = {
     "sample_percent": 0.2,
+    "max_sample_size": 100,
     "seed": 1234,
     "time_limit": 10
 }
@@ -47,7 +48,7 @@ class VRPModel(ModelFactory):
 
     def solve(self, n: int, distance: int, start_coordinate: Dict, network: NetworkFactory) -> List[List]:
         sample_coordinates = self._downsample(
-            network, self.parameters["sample_percent"], self.parameters["seed"])
+            network, self.parameters["sample_percent"], self.parameters["max_sample_size"], self.parameters["seed"])
         sample_nodes = self._find_sample_nodes(start_coordinate, sample_coordinates, network)
         distance_matrix = self._construct_distance_matrix(sample_nodes, network)
         manager, routing = self._construct_cp_model(n, distance, distance_matrix)
@@ -59,13 +60,14 @@ class VRPModel(ModelFactory):
             assignment)
         return results
 
-    def _downsample(self, network: NetworkFactory, sample_percent: float, seed: int) -> List[Dict]:
+    def _downsample(self, network: NetworkFactory, sample_percent: float, max_sample_size: int, seed: int) -> List[Dict]:
         """Downsample using KMeans"""
         coordinates = [
             [data["y"], data["x"]]
             for _, data in network.nodes.items()
         ]
-        sample_size = int(len(coordinates)*sample_percent)
+        percent_sample_size = int(len(coordinates)*sample_percent)
+        sample_size = percent_sample_size if percent_sample_size < max_sample_size else max_sample_size
         kmeans = KMeans(n_clusters=sample_size,
                         random_state=seed).fit(coordinates)
         sample_coordinates = [
