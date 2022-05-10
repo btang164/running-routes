@@ -630,7 +630,7 @@ python-versions = ">=3.6"
 name = "toml"
 version = "0.10.2"
 description = "Python Library for Tom's Obvious, Minimal Language"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -684,7 +684,7 @@ docker = ["gunicorn", "Flask"]
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.8"
-content-hash = "2633df0005c9a8ebd357b6d7611d0f9c15b94c87d1ce1773ff63f550d9891514"
+content-hash = "14c5207e42b205b58f79a2dac13af5ba01ef545e11051d51ffb3b1bf1458645d"
 
 [metadata.files]
 absl-py = [
