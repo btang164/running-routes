@@ -42,7 +42,7 @@ def _cli(distance, n, lat, lng):
     assembler = TourAssembler()
 
     routes = pipeline(
-        n, [lat, lng], distance,
+        n, {"lat": lat, "lng": lng}, distance,
         network=network, model=model, local_searches=local_searches,
         assembler=assembler)
 

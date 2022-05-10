@@ -19,7 +19,7 @@ poetry run running_routes \
     --distance 3000 \
     --n 5 \
     --lat -37.80960885346664 \
-    --long 144.96323726880522
+    --lng 144.96323726880522
 ```
 
 ## Semantics
