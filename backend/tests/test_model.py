@@ -44,14 +44,14 @@ class TestVRPModel:
         # setting sample_percent to 1 will return all nodes in the network
         sample_percent = 1
         seed = 1234
+        max_sample_percent = 100
         sample_coordinates = [
             {'lat': -37.8104663, 'lng': 144.962858},
             {'lat': -37.8100645, 'lng': 144.9626779},
             {'lat': -37.810335, 'lng': 144.9632837},
             {'lat': -37.8104393, 'lng': 144.9629538},
         ]
-        assert model._downsample(
-            network, sample_percent, seed) == sample_coordinates
+        assert model._downsample(network, sample_percent, max_sample_percent, seed) == sample_coordinates
 
     def test__find_sample_nodes(self, model, start_coordinate, network) -> None:
         sample_nodes= [6806666961, 6806666963, 2384426953, 6806666960]
