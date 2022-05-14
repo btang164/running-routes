@@ -65,6 +65,8 @@ jobs:
         cd frontend
         npm install
         npm run build
+        cd dist
+        echo 'www.running-routes.com' > CNAME
 
     - name: push to gh-pages
       run: |
