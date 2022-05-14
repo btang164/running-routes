@@ -1,19 +1,15 @@
-name: Build
+name: Deploy
 
 on:
   push:
     branches:
-      - build
+      - release
 
 jobs:
-  build:
+  backend:
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
-    
-    - name: Install system dependencies
-      run: |
-        sudo apt install jq
     
     - name: Generate python wheel and dependencies
       run: |
@@ -57,3 +53,22 @@ jobs:
         gcloud auth configure-docker australia-southeast2-docker.pkg.dev
         docker tag ${{ steps.images.outputs.DOCKERHUB_LATEST }} ${{ steps.images.outputs.GOOGLE_LATEST }}
         docker push ${{ steps.images.outputs.GOOGLE_LATEST }}
+
+  frontend:
+    needs: backend
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Build frontend
+      run: |
+        cd frontend
+        npm install
+        npm run build
+
+    - name: push to gh-pages
+      run: |
+        git config --global user.name "GitHub Actions"
+        git config --global user.email "<>"
+        git add -f frontend/dist && git commit -m "Building GitHub page"
+        git push origin `git subtree split --prefix frontend/dist main`:gh-pages --force
