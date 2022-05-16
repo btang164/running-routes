@@ -1,25 +1,140 @@
-<script setup>
-import HelloWorld from './components/HelloWorld.vue'
-import TheWelcome from './components/TheWelcome.vue'
+<script>
+import "leaflet/dist/leaflet.css"
+import { LMap, LCircle, LMarker, LTileLayer } from '@vue-leaflet/vue-leaflet';
+
+export default {
+  components: {
+    LMap,
+    LCircle,
+    LMarker,
+    LTileLayer,
+  },
+  data() {
+    return {
+      colours: {
+        "circle": "#b2182b"
+      },
+      circle: {
+        radius: 2500
+      },
+      map: {
+        zoom: 13,
+        bounds: null,
+        url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors'
+      },
+      user_inputs: {
+        nroutes: 1,
+        distance: 1000,
+        lat: 0,
+        lng: 0,
+      },
+    }
+  },
+  async created() {
+
+    // get user's coordinates from browser request
+    // this.$getLocation({})
+    //   .then(coordinates => {
+    //     this.myCoordinates = coordinates;
+    //   })
+    //   .catch(error => alert(error));
+
+    //   navigator.geolocation.getCurrentPosition({})
+    //     .then(coords => {
+    //       this.coords = coords;
+    //     })
+    //     .catch(error => alert(error))
+    // 
+
+    navigator.geolocation.getCurrentPosition(
+      position => {
+        console.log("Read location from HTML5's gelocation")
+        console.log([position.coords.latitude, position.coords.latitude])
+        this.user_inputs.lat = position.coords.latitude;
+        this.user_inputs.lng= position.coords.longitude;
+      },
+      error => {
+        console.log(error.message);
+        alert("Please refresh running-routes and share your location")
+      }
+    )
+  },
+  methods: {
+    updateBounds(value) {
+      this.$nextTick(() => {
+        this.$refs.myMap.leafletObject.flyToBounds(
+          this.$refs.outsideCircle.leafletObject.getBounds()
+        )
+      })
+    }
+    }
+  }
 </script>
 
 <template>
   <header>
-    <img alt="Vue logo" class="logo" src="./assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+    <div>
+      <h1>Running routes</h1>
+      <hr />
+      <h2>I want to run</h2>
+      <select v-model="user_inputs.distance" @change="updateBounds">
+        <option>1000</option>
+        <option>2000</option>
+        <option>3000</option>
+        <option>4000</option>
+        <option>5000</option>
+      </select>
+      <h2>meters.</h2>
+      <br />
+      <span>inputs: {{ user_inputs.distance }}, {{ user_inputs.distance / 2 }}</span>
+      <br />
+      <button>Generate</button>
+      <br />
+      <p>{{ user_inputs.lat }}</p>
+      <p>{{ user_inputs.lng}}</p>
+      <p>{{ map.bounds }}</p>
     </div>
   </header>
 
   <main>
-    <TheWelcome />
+    <div id="map"></div>
+    <l-map
+      ref="myMap"
+      :bounds="this.map.bounds"
+      :center="[this.user_inputs.lat, this.user_inputs.lng]"
+      style="height:100%; width:100%"
+    >
+      <l-tile-layer :url="this.map.url" :attribution="this.map.attribution"></l-tile-layer>
+      <l-marker :lat-lng="[user_inputs.lat, user_inputs.lng]" @move="updateBounds"></l-marker>
+      <l-circle
+        :lat-lng="[user_inputs.lat, user_inputs.lng]"
+        :radius="(user_inputs.distance / 2)"
+        :color="colours.circle"
+      ></l-circle>
+      <l-circle
+        ref="outsideCircle"
+        :lat-lng="[user_inputs.lat, user_inputs.lng]"
+        :radius="(50 + (user_inputs.distance / 2))"
+        :color="colours.circle"
+        :opacity="0"
+      ></l-circle>
+    </l-map>
   </main>
 </template>
 
 <style>
-@import './assets/base.css';
-
+@import "./assets/base.css";
+body {
+  padding: 0;
+  margin: 0;
+}
+html,
+body,
+#myMap {
+  height: 100%;
+  width: 100vw;
+}
 #app {
   max-width: 1280px;
   margin: 0 auto;
