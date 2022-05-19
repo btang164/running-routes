@@ -3,10 +3,34 @@ name: Deploy
 on:
   push:
     branches:
-      - release
+      - main
 
 jobs:
-  backend:
+  backend-test:
+    runs-on: ubuntu-20.04
+    steps:
+    - uses: actions/checkout@v2
+    
+    - name: Set up GIS dependencies
+      run: |
+        sudo add-apt-repository ppa:ubuntugis/ppa
+        sudo apt update
+        sudo apt install libspatialindex-dev gdal-bin
+
+    - name: Install dependencies
+      run: |
+        cd backend
+        curl -sSL https://install.python-poetry.org | python3 -
+        poetry --version
+        poetry install
+        
+    - name: Run Tests
+      run: |
+        cd backend
+        poetry run pytest .
+
+  backend-deploy:
+    needs: backend-test
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
@@ -54,8 +78,8 @@ jobs:
         docker tag ${{ steps.images.outputs.DOCKERHUB_LATEST }} ${{ steps.images.outputs.GOOGLE_LATEST }}
         docker push ${{ steps.images.outputs.GOOGLE_LATEST }}
 
-  frontend:
-    needs: backend
+  frontend-deploy:
+    needs: backend-test
     runs-on: ubuntu-20.04
     steps:
     - uses: actions/checkout@v2
