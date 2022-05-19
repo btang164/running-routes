@@ -97,4 +97,4 @@ jobs:
         git config --global user.name "GitHub Actions"
         git config --global user.email "<>"
         git add -f frontend/dist && git commit -m "Building GitHub page"
-        git push origin `git subtree split --prefix frontend/dist release`:gh-pages --force
+        git push origin `git subtree split --prefix frontend/dist main`:gh-pages --force
