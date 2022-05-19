@@ -3,6 +3,7 @@ from pathlib import Path
 import toml
 
 from flask import Flask, request
+from flask_cors import CORS
 
 from running_routes.assembler import RestAPIAssembler
 from running_routes.local_search import BacktrackEliminationLocalSearch
@@ -16,6 +17,7 @@ with PYPROJECT_FILE.open() as f:
     project_data = toml.load(f)
 
 app = Flask(__name__)
+CORS(app)
 
 network = OSMNetwork()
 model = VRPModel()
