@@ -1,5 +1,4 @@
 <script>
-import "leaflet/dist/leaflet.css"
 import { LMap, LCircle, LMarker, LTileLayer } from '@vue-leaflet/vue-leaflet';
 
 export default {
