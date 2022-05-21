@@ -1,4 +1,5 @@
 <script>
+import "leaflet/dist/leaflet.css"
 import { LMap, LCircle, LMarker, LTileLayer } from '@vue-leaflet/vue-leaflet';
 
 export default {
@@ -187,7 +188,6 @@ a,
     place-items: flex-start;
     flex-wrap: wrap;
   }
-
   .logo {
     margin: 0 2rem 0 0;
   }
