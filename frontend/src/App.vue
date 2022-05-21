@@ -134,9 +134,6 @@ export default {
         <option>5000</option>
         <option>6000</option>
         <option>7000</option>
-        <option>8000</option>
-        <option>9000</option>
-        <option>10000</option>
       </select>
       <h2>meters.</h2>
       <br />
