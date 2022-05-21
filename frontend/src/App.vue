@@ -1,6 +1,7 @@
 <script>
 import "leaflet/dist/leaflet.css"
-import { LMap, LCircle, LMarker, LTileLayer } from '@vue-leaflet/vue-leaflet';
+import { LMap, LCircle, LMarker, LTileLayer, LPolyline } from '@vue-leaflet/vue-leaflet';
+import axios from 'axios';
 
 export default {
   components: {
@@ -8,6 +9,8 @@ export default {
     LCircle,
     LMarker,
     LTileLayer,
+    LPolyline,
+    axios,
   },
   data() {
     return {
@@ -24,29 +27,33 @@ export default {
         attribution: '&copy; <a target="_blank" href="http://osm.org/copyright">OpenStreetMap</a> contributors'
       },
       user_inputs: {
-        nroutes: 1,
-        distance: 1000,
+        n: 5,
+        distance: 3000,
         lat: 0,
         lng: 0,
       },
+      api_output: [
+        {"coordinates": [], "distance": 0},
+        {"coordinates": [], "distance": 0},
+        {"coordinates": [], "distance": 0},
+        {"coordinates": [], "distance": 0},
+        {"coordinates": [], "distance": 0}
+      ]
     }
   },
   async created() {
-
     // get user's coordinates from browser request
     // this.$getLocation({})
     //   .then(coordinates => {
     //     this.myCoordinates = coordinates;
     //   })
     //   .catch(error => alert(error));
-
     //   navigator.geolocation.getCurrentPosition({})
     //     .then(coords => {
     //       this.coords = coords;
     //     })
     //     .catch(error => alert(error))
     // 
-
     navigator.geolocation.getCurrentPosition(
       position => {
         console.log("Read location from HTML5's gelocation")
@@ -67,7 +74,50 @@ export default {
           this.$refs.outsideCircle.leafletObject.getBounds()
         )
       })
-    }
+    },
+    clickButton(value) {
+      console.log("starting ")
+      axios
+        .get("https://running-routes-quubcdiruq-km.a.run.app/about")
+        .then(res => {
+          console.log("about success")
+          console.log(res)
+          })
+        .catch(function(error) {
+          console.log("about failure")
+          console.log(error)
+        })
+      console.log(this.user_inputs.n) 
+      console.log(this.user_inputs.distance) 
+      console.log(this.user_inputs.lat) 
+      console.log(this.user_inputs.lng) 
+      axios
+        .get(
+          "https://running-routes-quubcdiruq-km.a.run.app/pipeline/", 
+          {
+            params:{
+              n: this.user_inputs.n,
+              distance: this.user_inputs.distance,
+              lat: this.user_inputs.lat,
+              lng: this.user_inputs.lng,
+            }
+          }
+        )
+        .then(res => {
+          console.log(res)
+          this.api_output[0].coordinates = res.data.routes[0].coordinates
+          this.api_output[1].coordinates = res.data.routes[1].coordinates
+          this.api_output[2].coordinates = res.data.routes[2].coordinates
+          this.api_output[3].coordinates = res.data.routes[3].coordinates
+          this.api_output[4].coordinates = res.data.routes[4].coordinates
+        })
+        .catch(function (error){
+          console.log(error)
+          console.log(error.data)
+          console.log(error.status)
+          console.log(error.headers)
+        })
+      }
     }
   }
 </script>
@@ -79,17 +129,20 @@ export default {
       <hr />
       <h2>I want to run</h2>
       <select v-model="user_inputs.distance" @change="updateBounds">
-        <option>1000</option>
-        <option>2000</option>
         <option>3000</option>
         <option>4000</option>
         <option>5000</option>
+        <option>6000</option>
+        <option>7000</option>
+        <option>8000</option>
+        <option>9000</option>
+        <option>10000</option>
       </select>
       <h2>meters.</h2>
       <br />
       <span>inputs: {{ user_inputs.distance }}, {{ user_inputs.distance / 2 }}</span>
       <br />
-      <button>Generate</button>
+      <button @click="clickButton">Generate</button>
       <br />
       <p>{{ user_inputs.lat }}</p>
       <p>{{ user_inputs.lng}}</p>
@@ -119,6 +172,11 @@ export default {
         :color="colours.circle"
         :opacity="0"
       ></l-circle>
+      <l-polyline :lat-lngs="api_output[0].coordinates"></l-polyline>
+      <l-polyline :lat-lngs="api_output[1].coordinates"></l-polyline>
+      <l-polyline :lat-lngs="api_output[2].coordinates"></l-polyline>
+      <l-polyline :lat-lngs="api_output[3].coordinates"></l-polyline>
+      <l-polyline :lat-lngs="api_output[4].coordinates"></l-polyline>
     </l-map>
   </main>
 </template>
@@ -139,50 +197,41 @@ body,
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-
   font-weight: normal;
 }
-
 header {
   line-height: 1.5;
 }
-
 .logo {
   display: block;
   margin: 0 auto 2rem;
 }
-
 a,
 .green {
   text-decoration: none;
   color: hsla(160, 100%, 37%, 1);
   transition: 0.4s;
 }
-
 @media (hover: hover) {
   a:hover {
     background-color: hsla(160, 100%, 37%, 0.2);
   }
 }
-
 @media (min-width: 1024px) {
   body {
     display: flex;
     place-items: center;
   }
-
   #app {
     display: grid;
     grid-template-columns: 1fr 1fr;
     padding: 0 2rem;
   }
-
   header {
     display: flex;
     place-items: center;
     padding-right: calc(var(--section-gap) / 2);
   }
-
   header .wrapper {
     display: flex;
     place-items: flex-start;
