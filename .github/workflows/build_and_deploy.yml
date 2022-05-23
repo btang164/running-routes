@@ -77,6 +77,12 @@ jobs:
         gcloud auth configure-docker australia-southeast2-docker.pkg.dev
         docker tag ${{ steps.images.outputs.DOCKERHUB_LATEST }} ${{ steps.images.outputs.GOOGLE_LATEST }}
         docker push ${{ steps.images.outputs.GOOGLE_LATEST }}
+    
+    - name: Update Google Run image
+      uses: 'google-github-actions/deploy-cloudrun@v0'
+      with:
+        service: 'rr-gcloud-run'
+        image: ${{ steps.images.outputs.GOOGLE_LATEST }}
 
   frontend-deploy:
     needs: backend-test
