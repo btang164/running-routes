@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import itertools
+import math
 
 import networkx as nx
 from ortools.constraint_solver import routing_enums_pb2
@@ -77,8 +78,8 @@ class CPModel(ModelFactory):
         return sample_coordinates
 
     def _find_sample_nodes(
-                self, start_coordinate: Dict, sample_coordinates: List[Dict],
-                network: NetworkFactory) -> List:
+            self, start_coordinate: Dict, sample_coordinates: List[Dict],
+            network: NetworkFactory) -> List:
         # `location` is the zeroth element by construction
         # Remove any duplicate nodes
         # https://stackoverflow.com/a/17016257
@@ -208,7 +209,7 @@ class SavingsModel(ModelFactory):
         self.parameters = parameters
 
         # Set default parameters
-        for key, value in CLARKE_WRIGHT_SAVINGS_DEFAULT_PARAMETERS.items():
+        for key, value in SAVINGS_DEFAULT_PARAMETERS.items():
             if key not in self.parameters:
                 self.parameters[key] = value
 
@@ -223,7 +224,7 @@ class SavingsModel(ModelFactory):
 
         for saving in savings:
             routes = self._merge_routes(saving, routes, network, self.parameters["max_node"], distance)
-        
+
         results = self._circularity_filter(n, routes, network)
         return results
 
@@ -244,8 +245,8 @@ class SavingsModel(ModelFactory):
         return sample_coordinates
 
     def _find_sample_nodes(
-                self, start_coordinate: Dict, sample_coordinates: List[Dict],
-                network: NetworkFactory) -> List:
+            self, start_coordinate: Dict, sample_coordinates: List[Dict],
+            network: NetworkFactory) -> List:
         # `location` is the zeroth element by construction
         # Remove any duplicate nodes
         # https://stackoverflow.com/a/17016257
@@ -325,13 +326,13 @@ class SavingsModel(ModelFactory):
                 outer_saving_index = saving_1_index
 
             adjacent_outer_saving_nodes = [
-                    outer_route[outer_saving_index-1],
-                    outer_route[outer_saving_index+1]
-                    ]
+                outer_route[outer_saving_index-1],
+                outer_route[outer_saving_index+1]
+            ]
             crossings = {
                 outer: network.length(outer, inner_route[-1])
                 for outer in adjacent_outer_saving_nodes
-                }
+            }
             outer_crossing = min(crossings, key=crossings.get)
 
             first_split, second_split = self._split_route(
@@ -342,9 +343,11 @@ class SavingsModel(ModelFactory):
         # Saving contains no exterior node
         else:
             if ((
-                network.length(start_node, route_0[1]) + network.length(route_0[-2], start_node) + network.length(route_1[1], route_1[-2])
+                network.length(start_node, route_0[1]) + network.length(route_0[-2],
+                                                                        start_node) + network.length(route_1[1], route_1[-2])
             ) < (
-                network.length(start_node, route_1[1]) + network.length(route_1[-2], start_node) + network.length(route_0[1], route_0[-2])
+                network.length(start_node, route_1[1]) + network.length(route_1[-2],
+                                                                        start_node) + network.length(route_0[1], route_0[-2])
             )):
                 outer_route, inner_route = route_0, route_1
                 outer_saving_index, inner_saving_index = saving_0_index, saving_1_index
@@ -353,17 +356,17 @@ class SavingsModel(ModelFactory):
                 outer_saving_index, inner_saving_index = saving_1_index, saving_0_index
 
             adjacent_outer_saving_nodes = [
-                    outer_route[outer_saving_index-1],
-                    outer_route[outer_saving_index+1]
-                    ]
+                outer_route[outer_saving_index-1],
+                outer_route[outer_saving_index+1]
+            ]
             adjacent_inner_saving_nodes = [
-                    inner_route[inner_saving_index-1],
-                    inner_route[inner_saving_index+1]
-                    ]
+                inner_route[inner_saving_index-1],
+                inner_route[inner_saving_index+1]
+            ]
             crossings = {
                 (outer, inner): network.length(outer, inner)
                 for outer, inner in itertools.product(adjacent_outer_saving_nodes, adjacent_inner_saving_nodes)
-                }
+            }
             outer_crossing, inner_crossing = min(crossings, key=crossings.get)
             first_split, second_split = self._split_route(
                 outer_route, outer_route[outer_saving_index], outer_crossing)
