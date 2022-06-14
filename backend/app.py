@@ -7,7 +7,7 @@ from flask_cors import CORS
 
 from running_routes.assembler import RestAPIAssembler
 from running_routes.local_search import BacktrackEliminationLocalSearch
-from running_routes.model import VRPModel
+from running_routes.model import SavingsModel
 from running_routes.network import OSMNetwork
 from running_routes.pipeline import pipeline
 
@@ -20,7 +20,7 @@ app = Flask(__name__)
 CORS(app)
 
 network = OSMNetwork()
-model = VRPModel()
+model = SavingsModel()
 local_searches = [BacktrackEliminationLocalSearch()]
 assembler = RestAPIAssembler()
 
