@@ -1,7 +1,7 @@
 import pytest
 
 from running_routes.network import OSMNetwork
-from running_routes.model import VRPModel
+from running_routes.model import CPModel, SavingsModel
 
 @pytest.fixture
 def n():
@@ -30,14 +30,14 @@ def network(start_coordinate, distance):
 
 
 @pytest.fixture
-def model(sample_percent):
-    return VRPModel(sample_percent=sample_percent, time_limit=2)
+def cp_model(sample_percent):
+    return CPModel(sample_percent=sample_percent, time_limit=2)
 
 
-class TestVRPModel:
-    def test_solve(self, n, distance, model, start_coordinate, network) -> None:
-        test_results = [[6806666961, 6806666963, 6806666961]]
-        results = model.solve(n, distance, start_coordinate, network)
+class TestCPModel:
+    def test_solve(self, n, distance, cp_model, start_coordinate, network) -> None:
+        test_results = [[6806666961, 7913378977, 6167279410, 7913378977, 6167279411, 7913378977, 6806666961]]
+        results = cp_model.solve(n, distance, start_coordinate, network)
         assert results == test_results
 
     def test__downsample(self, model, network) -> None:

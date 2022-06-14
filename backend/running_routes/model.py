@@ -42,7 +42,7 @@ class VRPModel(ModelFactory):
         self.parameters = parameters
 
         # Set default parameters
-        for key, value in VRP_DEFAULT_PARAMETERS.items():
+        for key, value in CP_DEFAULT_PARAMETERS.items():
             if key not in self.parameters:
                 self.parameters[key] = value
 
