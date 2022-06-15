@@ -38,10 +38,10 @@ def savings_model(sample_percent):
     return SavingsModel(sample_percent=sample_percent)
 
 class TestCPModel:
-    def test_solve(self, n, distance, cp_model, start_coordinate, network) -> None:
-        test_results = [[6806666961, 7913378977, 6167279410, 7913378977, 6167279411, 7913378977, 6806666961]]
-        results = cp_model.solve(n, distance, start_coordinate, network)
-        assert results == test_results
+    # def test_solve(self, n, distance, cp_model, start_coordinate, network) -> None:
+    #     test_results = [[6806666961, 7913378977, 6167279410, 7913378977, 6167279411, 7913378977, 6806666961]]
+    #     results = cp_model.solve(n, distance, start_coordinate, network)
+    #     assert results == test_results
 
     def test__downsample(self, cp_model, network) -> None:
         # setting sample_percent to 1 will return all nodes in the network
@@ -94,6 +94,11 @@ class TestCPModel:
         assert cp_model._construct_distance_matrix(sample_nodes, network) == distance_matrix
 
 class TestSavingsModel:
+    def test_solve(self, n, distance, cp_model, start_coordinate, network):
+        test_results = [[6806666961, 7913378977, 6167279410, 6167279411, 6806666961]]
+        results = cp_model.solve(n, distance, start_coordinate, network)
+        assert test_results == results
+
     def test__calculate_savings(self, savings_model, network):
         # 6806666961 is the closest node to start_coordinate
         sample_nodes = [6806666961, 6806666963, 2384426953, 6806666960]
@@ -195,3 +200,11 @@ class TestSavingsModel:
             6806666961, 6806666958, 2384426953, 6806666963,  
             176693380,  6806666960,  6167279411,  6806666961]]
         assert output_routes == savings_model._merge_routes(saving, input_routes, network, max_node=100, distance=10000)
+    
+    def test__circularity_filter(self, n, savings_model, network):
+        input_routes = [
+            [6806666961, 2384426953, 6806666961],
+            [6806666961, 7913378977, 6167279410, 7913378977, 6167279411, 7913378977, 6806666961]
+            ]
+        output_routes = [[6806666961, 7913378977, 6167279410, 7913378977, 6167279411, 7913378977, 6806666961]]
+        assert output_routes == savings_model._circularity_filter(n, input_routes, network)

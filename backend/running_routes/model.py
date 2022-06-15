@@ -5,6 +5,8 @@ import math
 import networkx as nx
 from ortools.constraint_solver import routing_enums_pb2
 from ortools.constraint_solver import pywrapcp
+import osmnx
+import shapely
 from sklearn.cluster import KMeans
 
 from running_routes.network import NetworkFactory
@@ -135,6 +137,14 @@ class CPModel(ModelFactory):
         routing.AddDimension(
             transit_callback_index, 0, distance, True, dimension_name)
 
+        # Add max node capacity
+        routing.AddDimensionWithVehicleCapacity(
+        demand_callback_index,
+        0,  # null capacity slack
+        data['vehicle_capacities'],  # vehicle maximum capacities
+        True,  # start cumul to zero
+        'Capacity')
+
         # Add the ability to drop nodes for a penalty
         drop_penalty = n*distance
         for node in range(1, len(distance_matrix)):
@@ -170,7 +180,6 @@ class CPModel(ModelFactory):
         for route_id in range(n):
             index = routing.Start(route_id)
             candidate_tour = []
-            single_route = []
 
             # Extract the tour from candidate nodes and cp model
             while not routing.IsEnd(index):
@@ -179,15 +188,8 @@ class CPModel(ModelFactory):
                 index = assignment.Value(routing.NextVar(index))
             node_index = manager.IndexToNode(index)
             candidate_tour.append(candidate_nodes[node_index])
+            results.append(candidate_tour)
 
-            # Join the tour with the shortest paths
-            for source, target in zip(candidate_tour, candidate_tour[1:]):
-                single_route.extend(network.path(source, target))
-            single_route += [single_route[0]]
-
-            # Remove any duplicate nodes in the route
-            dedup_nodes = [group[0] for group in itertools.groupby(single_route)]
-            results.append(dedup_nodes)
         return results
 
 
@@ -379,5 +381,29 @@ class SavingsModel(ModelFactory):
 
         return [route for route in routes if route not in [route_0, route_1]] + [merged_route]
 
-    def _circularity_filter(self, n: int, routes: List[List], network: NetworkFactory, sample_nodes: List) -> List[List]:
-        pass
+    def _circularity_filter(self, n: int, routes: List[List], network: NetworkFactory) -> List[List]:
+         # https://sciencing.com/calculate-circularity-5138742.html
+        measurement = {}
+        for i, route in enumerate(routes):
+            extended_route = []
+            for source, target in zip(route, route[1:]):
+                extended_route.extend(network.path(source, target))
+            extended_route += [extended_route[0]]
+            extended_route = [group[0] for group in itertools.groupby(extended_route)]
+
+            subgraph = network.graph.subgraph(extended_route)
+            projected_subgraph = osmnx.projection.project_graph(subgraph)
+            y_coordinates = nx.get_node_attributes(projected_subgraph, "y")
+            x_coordinates = nx.get_node_attributes(projected_subgraph, "x")
+
+            routes_to_xy = [
+                [x_coordinates[node], y_coordinates[node]]
+                for node in extended_route]
+            polygon = shapely.geometry.Polygon(routes_to_xy)
+            area = polygon.area
+            perimeter = polygon.length
+            measurement[i] = 4*math.pi * area / perimeter**2
+        sorted_data = [i for i, _ in sorted(measurement.items(), key=lambda item: item[1], reverse=True)]
+
+        results = [routes[i] for i in sorted_data[:n]]
+        return results
