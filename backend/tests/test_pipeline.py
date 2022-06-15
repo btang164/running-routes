@@ -2,7 +2,7 @@ import pytest
 
 from running_routes.assembler import TourAssembler
 from running_routes.local_search import BacktrackEliminationLocalSearch
-from running_routes.model import VRPModel
+from running_routes.model import CPModel
 from running_routes.network import OSMNetwork
 from running_routes.pipeline import pipeline
 
@@ -29,7 +29,7 @@ def network():
 
 @pytest.fixture
 def model():
-    return VRPModel()
+    return CPModel()
 
 
 @pytest.fixture

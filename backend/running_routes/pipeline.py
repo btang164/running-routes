@@ -2,7 +2,7 @@ import click
 
 from running_routes.assembler import TourAssembler, AssemblerFactory
 from running_routes.local_search import LocalSearchFactory, BacktrackEliminationLocalSearch
-from running_routes.model import ModelFactory, VRPModel
+from running_routes.model import ModelFactory, CPModel
 from running_routes.network import NetworkFactory, OSMNetwork
 
 from typing import Dict, List, Optional
@@ -37,7 +37,7 @@ def pipeline(
 @click.option("--lng", type=float, required=True)
 def _cli(distance, n, lat, lng):
     network = OSMNetwork()
-    model = VRPModel()
+    model = CPModel()
     local_searches = [BacktrackEliminationLocalSearch()]
     assembler = TourAssembler()
 
