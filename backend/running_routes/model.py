@@ -137,14 +137,6 @@ class CPModel(ModelFactory):
         routing.AddDimension(
             transit_callback_index, 0, distance, True, dimension_name)
 
-        # Add max node capacity
-        routing.AddDimensionWithVehicleCapacity(
-        demand_callback_index,
-        0,  # null capacity slack
-        data['vehicle_capacities'],  # vehicle maximum capacities
-        True,  # start cumul to zero
-        'Capacity')
-
         # Add the ability to drop nodes for a penalty
         drop_penalty = n*distance
         for node in range(1, len(distance_matrix)):
