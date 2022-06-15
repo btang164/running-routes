@@ -30,7 +30,7 @@ poetry run running_routes \
 | `start_coordinate` | Coordinate (lat, lng) where all routes start and stop | `[-37.80960885346664, 144.96323726880522]`|
 |`node`| Network analogue to a lat-long coordinate | 0
 |`start_node`| Network analogue of `start_coordinate`| 0
-|`tour`| A list of nodes that start and end at `start_coordinate` where each consecutive node is adjacent in the network|`[0, 1, 0]`
+|`tour`| A list of nodes that start and end at `start_coordinate` |`[0, 1, 0]`
 |`tours`| Array of length `n` where each element is a `tour`|`[[0, 1, 0], [0, 2, 0]]`
 |`routes`| Lat-long representation of `tours` - May contain route metadata| `[[[1, 1], ..., [1, 1]]]`
 |`length`| The distance, in meters, between two adjacent nodes| 5 |
