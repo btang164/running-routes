@@ -1,4 +1,4 @@
-FROM osgeo/gdal:ubuntu-small-latest AS build
+FROM osgeo/gdal:ubuntu-small-3.5.0 AS build
 RUN apt update; apt install -y python3-pip
 RUN rm -rf /usr/lib/python3/dist-packages/numpy*
 
@@ -8,7 +8,7 @@ RUN pip3 install -r requirements.txt
 COPY ./dist/*.whl .
 RUN pip3 install *.whl
 
-FROM osgeo/gdal:ubuntu-small-latest
+FROM osgeo/gdal:ubuntu-small-3.5.0
 RUN rm -rf /usr/lib/python3/dist-packages/numpy*
 WORKDIR /app
 RUN apt install -y gunicorn
