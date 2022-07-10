@@ -43,34 +43,34 @@ class TestCPModel:
     #     results = cp_model.solve(n, distance, start_coordinate, network)
     #     assert results == test_results
 
-    def test__downsample(self, cp_model, network) -> None:
-        # setting sample_percent to 1 will return all nodes in the network
-        sample_percent = 1
-        seed = 1234
-        max_sample_percent = 100
-        sample_coordinates = [
-            {'lat': -37.8108737, 'lng': 144.9631356},
-            {'lat': -37.8102442, 'lng': 144.9621553},
-            {'lat': -37.8101955, 'lng': 144.963686},
-            {'lat': -37.8107574, 'lng': 144.9636583},
-            {'lat': -37.8100645, 'lng': 144.9626779},
-            {'lat': -37.810335, 'lng': 144.9632837},
-            {'lat': -37.8104663, 'lng': 144.962858},
-            {'lat': -37.8105339, 'lng': 144.9634555},
-            {'lat': -37.8109981, 'lng': 144.9628452},
-            {'lat': -37.8106851, 'lng': 144.9624361},
-            {'lat': -37.8100454, 'lng': 144.9638521},
-            {'lat': -37.8104393, 'lng': 144.9629538},
-            {'lat': -37.8101553, 'lng': 144.9638469},
-            {'lat': -37.8101334, 'lng': 144.9621113},
-            {'lat': -37.8105126, 'lng': 144.9635476},
-            {'lat': -37.8109074, 'lng': 144.9631515},
-            {'lat': -37.8107249, 'lng': 144.9636447},
-            {'lat': -37.8109391, 'lng': 144.9631663},
-            {'lat': -37.8110299, 'lng': 144.9628595},
-            {'lat': -37.810221, 'lng': 144.9621461}
-        ]
-        assert cp_model._downsample(network, sample_percent, max_sample_percent, seed) == sample_coordinates
+    # def test__downsample(self, cp_model, network) -> None:
+    #     # setting sample_percent to 1 will return all nodes in the network
+    #     sample_percent = 1
+    #     seed = 1234
+    #     max_sample_percent = 100
+    #     sample_coordinates = [
+    #         {'lat': -37.8108737, 'lng': 144.9631356},
+    #         {'lat': -37.8102442, 'lng': 144.9621553},
+    #         {'lat': -37.8101955, 'lng': 144.963686},
+    #         {'lat': -37.8107574, 'lng': 144.9636583},
+    #         {'lat': -37.8100645, 'lng': 144.9626779},
+    #         {'lat': -37.810335, 'lng': 144.9632837},
+    #         {'lat': -37.8104663, 'lng': 144.962858},
+    #         {'lat': -37.8105339, 'lng': 144.9634555},
+    #         {'lat': -37.8109981, 'lng': 144.9628452},
+    #         {'lat': -37.8106851, 'lng': 144.9624361},
+    #         {'lat': -37.8100454, 'lng': 144.9638521},
+    #         {'lat': -37.8104393, 'lng': 144.9629538},
+    #         {'lat': -37.8101553, 'lng': 144.9638469},
+    #         {'lat': -37.8101334, 'lng': 144.9621113},
+    #         {'lat': -37.8105126, 'lng': 144.9635476},
+    #         {'lat': -37.8109074, 'lng': 144.9631515},
+    #         {'lat': -37.8107249, 'lng': 144.9636447},
+    #         {'lat': -37.8109391, 'lng': 144.9631663},
+    #         {'lat': -37.8110299, 'lng': 144.9628595},
+    #         {'lat': -37.810221, 'lng': 144.9621461}
+    #     ]
+    #     assert cp_model._downsample(network, sample_percent, max_sample_percent, seed) == sample_coordinates
 
     def test__find_sample_nodes(self, cp_model, start_coordinate, network) -> None:
         sample_nodes= [6806666961, 6806666963, 2384426953, 6806666960]
