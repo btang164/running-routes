@@ -93,7 +93,7 @@ export default {
       console.log(this.user_inputs.lng) 
       axios
         .get(
-          "https://rr-gcloud-run-quubcdiruq-km.a.run.app/pipeline/", 
+          "https://running-routes-quubcdiruq-km.a.run.app/pipeline",
           {
             params:{
               n: this.user_inputs.n,
